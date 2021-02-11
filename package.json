@@ -1,0 +1,39 @@
+{
+  "name": "stream_a_lot",
+  "version": "1.0.0",
+  "description": "a music-streaming application for the web",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon ./server/index.js",
+    "start:dev": "NODE_ENV=development nodemon ./server/index.js",
+    "start:prod": "NODE_ENV=production node ./server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/3m3kalionel/stream_a_lot.git"
+  },
+  "author": "3m3kalionel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/3m3kalionel/stream_a_lot/issues"
+  },
+  "homepage": "https://github.com/3m3kalionel/stream_a_lot#readme",
+  "dependencies": {
+    "async": "^3.2.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.11.15",
+    "mongoose-beautiful-unique-validation": "^7.1.1",
+    "multer": "^1.4.2"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "nodemon": "^2.0.7"
+  }
+}
