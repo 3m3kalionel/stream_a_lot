@@ -13,6 +13,10 @@ const router = app => {
   app.post("/api/v1/track", trackController.createTrack);
   app.get("/api/v1/track/:trackId", trackController.getTrack);
   app.post("/api/v1/playlist", playlistController.createPlaylist);
+  app.put(
+    "/api/v1/playlist/:playlistId",
+    playlistController.addTracksToPlaylist
+  );
 };
 
 export default router;

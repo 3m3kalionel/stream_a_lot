@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 import artisteModel from "./models/artisteModel";
+import playlistModel from "./models/playlistModel";
 import userModel from "./models/userModel";
 
 export const isEmpty = fieldValue => {
