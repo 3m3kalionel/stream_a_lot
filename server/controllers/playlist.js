@@ -64,6 +64,59 @@ const createPlaylist = async (req, res) => {
   }
 };
 
+const addTracksToPlaylist = async (req, res) => {
+  const { playlistId } = req.params;
+  const { trackId: trackIdsToAdd } = req.body;
+
+  const playlist = await validateDocument("playlist", playlistId, {});
+  if (playlist.error) {
+    const {
+      error: { code, message },
+    } = playlist;
+    return res.status(code).send({
+      message,
+    });
+  }
+
+  const records = await gridFsTrackModel.find(
+    {
+      _id: {
+        $in: trackIdsToAdd,
+      },
+    },
+    "_id"
+  );
+
+  const getResponseMessage = (records, trackIdsToAdd) => {
+    return records.length === trackIdsToAdd.length
+      ? "status: success - track(s) added to playlist"
+      : "status: success - valid track(s) added to playlist";
+  };
+
+  const updatedPlaylist = await playlistModel.findByIdAndUpdate(
+    playlistId,
+    {
+      $addToSet: {
+        tracks: {
+          $each: records,
+        },
+      },
+    },
+    {
+      new: true,
+      returnNewDocument: true,
+      useFindAndModify: false,
+      // runValidators
+    }
+  );
+
+  return res.status(200).send({
+    message: getResponseMessage(records, trackIdsToAdd),
+    tracks: updatedPlaylist.tracks,
+  });
+};
+
 export default {
   createPlaylist,
+  addTracksToPlaylist,
 };
