@@ -17,6 +17,7 @@ const router = app => {
     "/api/v1/playlist/:playlistId",
     playlistController.addTracksToPlaylist
   );
+  app.delete("/api/v1/playlist/:playlistId", playlistController.deletePlaylist);
 };
 
 export default router;

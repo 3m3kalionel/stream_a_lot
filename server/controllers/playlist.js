@@ -1,3 +1,4 @@
+import gridFsTrackModel from "../models/gridFsTrackModel";
 import playlistModel from "../models/playlistModel";
 import userModel from "../models/userModel";
 import { handleError, validateDocument, isValidMongoId } from "../utils";
@@ -116,7 +117,38 @@ const addTracksToPlaylist = async (req, res) => {
   });
 };
 
+const deletePlaylist = async (req, res) => {
+  const { playlistId } = req.params;
+
+  if (!isValidMongoId(playlistId)) {
+    return res.status(400).send({
+      message:
+        "status: failed - please enter a valid id for the playlist owner",
+    });
+  }
+
+  try {
+    await playlistModel.findByIdAndDelete(playlistId, function (
+      error,
+      document
+    ) {
+      if (document === null) {
+        return res.status(404).send({
+          message: `status: failed - playlist id ${playlistId} not found`,
+        });
+      }
+    });
+
+    return res.status(200).send({ message: "deleted" });
+  } catch (err) {
+    res.status(400).send({
+      message: "status: failed - something went wrong",
+    });
+  }
+};
+
 export default {
   createPlaylist,
   addTracksToPlaylist,
+  deletePlaylist,
 };
