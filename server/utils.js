@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 import artisteModel from "./models/artisteModel";
+import userModel from "./models/userModel";
 
 export const isEmpty = fieldValue => {
   return !(fieldValue.trim().length === 0);
