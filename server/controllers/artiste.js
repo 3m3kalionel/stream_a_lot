@@ -52,7 +52,6 @@ const getArtiste = async (req, res) => {
       artiste,
     });
   } catch (err) {
-    console.log("resssss", err);
     return res.status(400).send({
       message: "status: failed - something went wrong",
     });

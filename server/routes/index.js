@@ -1,6 +1,7 @@
 import controllers from "../controllers";
 
 const artisteController = controllers.artiste;
+const playlistController = controllers.playlist;
 const trackController = controllers.track;
 const userController = controllers.user;
 
@@ -11,6 +12,7 @@ const router = app => {
   app.get("/api/v1/artiste/:artisteId", artisteController.getArtiste);
   app.post("/api/v1/track", trackController.createTrack);
   app.get("/api/v1/track/:trackId", trackController.getTrack);
+  app.post("/api/v1/playlist", playlistController.createPlaylist);
 };
 
 export default router;
