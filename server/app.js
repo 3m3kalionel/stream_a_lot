@@ -9,11 +9,14 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-
+app.use(express.static(__dirname + "/views"));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get("*", (req, res) => res.status(200).send("Yo! Welcome to stream_a_lot"));
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/views/audio.html");
+});
+
+app.use(bodyParser.urlencoded({ extended: false }));
 
 routes(app);
 connect();

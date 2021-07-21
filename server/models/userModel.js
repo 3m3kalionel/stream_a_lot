@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema({
   favouriteTracks: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "File",
+      ref: "Track",
     },
   ],
   favouritePlaylists: [

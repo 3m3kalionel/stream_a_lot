@@ -1,5 +1,5 @@
-import gridFsTrackModel from "../models/gridFsTrackModel";
 import playlistModel from "../models/playlistModel";
+import gridFsTrackModel from "../models/gridFsTrackModel";
 import userModel from "../models/userModel";
 import { handleError, validateDocument, isValidMongoId } from "../utils";
 
@@ -63,6 +63,28 @@ const createPlaylist = async (req, res) => {
       message: "status: failed - something went wrong",
     });
   }
+};
+
+const getPlaylist = async (req, res) => {
+  const playlist = await playlistModel
+    .findById(req.params.playlistId)
+    .populate("creatorId", "username")
+    .populate("tracks", "-createdAt -updatedAt -__v")
+    .select("-createdAt -updatedAt -__v");
+
+  if (playlist.error) {
+    const {
+      error: { code, message },
+    } = playlist;
+    return res.status(code).send({
+      message,
+    });
+  }
+
+  return res.status(200).send({
+    message: "status: success - playlist found",
+    playlist,
+  });
 };
 
 const addTracksToPlaylist = async (req, res) => {
@@ -149,6 +171,7 @@ const deletePlaylist = async (req, res) => {
 
 export default {
   createPlaylist,
-  addTracksToPlaylist,
+  getPlaylist,
   deletePlaylist,
+  addTracksToPlaylist,
 };

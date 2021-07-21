@@ -2,7 +2,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import userModel from "../models/userModel";
-import { handleError } from "../utils";
+import {
+  handleError,
+  getUserFavouritesReturnFields,
+  validateDocument,
+  getUserFavouritesUpdateObject,
+} from "../utils";
 
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -25,7 +30,7 @@ const signup = async (req, res) => {
     if (err) {
       return handleError(err, res);
     }
-    const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET, {
+    const token = jwt.sign({ userId: user.id }, "process.env.APP_SECRET", {
       expiresIn: 120,
     });
 
@@ -48,7 +53,7 @@ const signin = async (req, res) => {
       .status(422)
       .send({ message: "status: failed - Please provide email and password" });
   }
-  const existingUser = await userModel.findOne({
+  let existingUser = await userModel.findOne({
     email: email.toLowerCase(),
   });
 
@@ -72,9 +77,13 @@ const signin = async (req, res) => {
         }
       );
 
+      existingUser = existingUser.toObject();
+      delete existingUser.password;
+
       return res.status(200).json({
         messge: "status: success - signed in",
         token,
+        existingUser,
       });
     } else {
       return res.status(400).send({
@@ -84,7 +93,140 @@ const signin = async (req, res) => {
   });
 };
 
+const getUserFavourites = async (req, res) => {
+  const { userId, filterQuery } = req.params;
+  const [field, ...filteredField] = getUserFavouritesReturnFields(filterQuery);
+  const returnFields = "_id username";
+
+  const user = await userModel
+    .findById(userId)
+    .select("_id username")
+    .populate(field, filteredField);
+
+  return res.status(200).send({
+    message: "status: success - user favourites found",
+    user,
+  });
+};
+
+const addToFavourites = async (req, res) => {
+  const { userId, favouritesCategory, favouritesCategoryId } = req.params;
+  const [field, ...filteredFields] = getUserFavouritesReturnFields(
+    favouritesCategory
+  );
+
+  const document = await validateDocument(
+    favouritesCategory,
+    favouritesCategoryId,
+    {}
+  );
+
+  if (document.error) {
+    const {
+      error: { code, message },
+    } = document;
+    return res.status(code).send({
+      message,
+    });
+  }
+
+  try {
+    const update = await userModel
+      .findByIdAndUpdate(
+        // runValidators
+        userId,
+        {
+          $addToSet: getUserFavouritesUpdateObject(
+            favouritesCategory,
+            favouritesCategoryId
+          ),
+        },
+        {
+          new: true,
+          useFindAndModify: false,
+          runValidators: true,
+        }
+      )
+      .select(field)
+      .populate(field, filteredFields);
+
+    if (document && update) {
+      return res.status(200).send({
+        message: "status: success - added to favourites",
+        update,
+      });
+    }
+  } catch (error) {
+    res.status(400).send({
+      error,
+    });
+  }
+};
+
+const removeFromFavourites = async (req, res) => {
+  const { userId, favouritesCategory, favouritesCategoryId } = req.params;
+  const [field, ...filteredFields] = getUserFavouritesReturnFields(
+    favouritesCategory
+  );
+
+  const document = await validateDocument(
+    favouritesCategory,
+    favouritesCategoryId,
+    {}
+  );
+
+  if (document.error) {
+    const {
+      error: { code, message },
+    } = document;
+    return res.status(code).send({
+      message,
+    });
+  }
+  try {
+    const update = await userModel
+      .findByIdAndUpdate(
+        // runValidators
+        userId,
+        {
+          $pull: getUserFavouritesUpdateObject(
+            favouritesCategory,
+            favouritesCategoryId
+          ),
+        },
+        {
+          new: true,
+          useFindAndModify: false,
+          runValidators: true,
+        },
+        function (error, document) {
+          if (document === null) {
+            return res.status(404).send({
+              message: `status: failed - id ${userId} not found`,
+            });
+          }
+        }
+      )
+      .select(field)
+      .populate(field, filteredFields);
+
+    if (document && update) {
+      return res.status(200).send({
+        message: "status: success - removed from favourites",
+        update,
+      });
+    }
+  } catch (error) {
+    res.status(400).send({
+      error,
+    });
+  }
+};
+
 export default {
   signup,
   signin,
+  getUserFavourites,
+  addToFavourites,
+  removeFromFavourites,
 };

@@ -3,9 +3,14 @@ import mongoose from "mongoose";
 import artisteModel from "./models/artisteModel";
 import playlistModel from "./models/playlistModel";
 import userModel from "./models/userModel";
+import gridFsModel from "./models/gridFsTrackModel";
 
 export const isEmpty = fieldValue => {
   return !(fieldValue.trim().length === 0);
+};
+
+export const isIncorrectEnumValue = fieldValue => {
+  return !["public", "private"].includes(fieldValue);
 };
 
 export const handleError = ({ errors }, res) => {
@@ -31,6 +36,23 @@ export const isValidMongoId = id => {
   }
 };
 
+export function getUserFavouritesReturnFields(inputField) {
+  switch (inputField) {
+    case "playlists":
+    case "playlist":
+      return ["favouritePlaylists", "title"];
+      break;
+    case "tracks":
+    case "track":
+      return ["favouriteTracks", "title", "artiste", "featuredArtistes"];
+      break;
+    case "artistes":
+    case "artiste":
+      return ["favouriteArtistes", "name"];
+      break;
+  }
+}
+
 const getModel = modelParam => {
   switch (modelParam) {
     case "playlist":
@@ -47,6 +69,29 @@ const getModel = modelParam => {
       break;
   }
 };
+
+export function getUserFavouritesUpdateObject(
+  favouritesCategory,
+  favouritesCategoryId
+) {
+  switch (favouritesCategory) {
+    case "artiste":
+      return {
+        favouriteArtistes: favouritesCategoryId,
+      };
+      break;
+    case "playlist":
+      return {
+        favouritePlaylists: favouritesCategoryId,
+      };
+      break;
+    case "track":
+      return {
+        favouriteTracks: favouritesCategoryId,
+      };
+      break;
+  }
+}
 
 export async function validateDocument(modelParam, documentId, queryOptions) {
   const error = new Error();

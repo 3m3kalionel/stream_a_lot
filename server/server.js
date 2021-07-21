@@ -2,6 +2,7 @@ import { createServer } from "http";
 
 import app from "./app";
 
+// set up the server
 const port = parseInt(process.env.PORT, 10) || 8000;
 
 app.set("port", port);

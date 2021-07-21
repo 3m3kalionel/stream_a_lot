@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import { isEmpty } from "../utils";
+import { isEmpty, isIncorrectEnumValue } from "../utils";
 
 const PlaylistSchema = new mongoose.Schema(
   {
@@ -39,6 +39,15 @@ const PlaylistSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["private", "public"],
+      // required: "Please specify either public or private",
+      // validate: {
+      //   validator: function (field) {
+      //     return isIncorrectEnumValue(field);
+      //   },
+      //   message: () => {
+      //     return "status: failed - Please enter 'public' or 'private' as the status";
+      //   },
+      // },
       default: "public",
     },
   },
