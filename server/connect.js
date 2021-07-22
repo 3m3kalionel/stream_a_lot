@@ -5,13 +5,6 @@ let db;
 
 mongoose.Promise = global.Promise;
 
-// const connect = async (config = envConfig) => {
-//   const database = await mongoose.connect(config.db.url, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//     useCreateIndex: true,
-//   });
-
 const getAppUrl = env => {
   let appUrl;
   switch (env) {
@@ -28,15 +21,11 @@ const getAppUrl = env => {
 };
 
 const connect = async (config = envConfig) => {
-  const database = await mongoose.connect(
-    // "mongodb+srv://whitebeltdev:bCyPJFx3mr2rYQu@cluster0.zmsqz.mongodb.net/<dbname>?retryWrites=true&w=majority",
-    getAppUrl(process.env.NODE_ENV),
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    }
-  );
+  const database = await mongoose.connect(getAppUrl(process.env.NODE_ENV), {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+  });
 
   mongoose.connection.on("connected", () => {
     console.log("Connected to a mongo instance");
